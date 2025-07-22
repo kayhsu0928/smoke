@@ -155,7 +155,7 @@
     const progress = document.getElementById("progress");
 
     startBtn.onclick = () => {
-      quizQuestions = allQuestions.sort(() => 0.5 - Math.random()).slice(0, 3);
+      quizQuestions = allQuestions.sort(() => 0.5 - Math.random()).slice(0, 10);
       introDiv.classList.add("hidden");
       quizDiv.classList.remove("hidden");
       showQuestion();
