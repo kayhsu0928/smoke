@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>拒絕新型菸品，大會考開始！</title>
+  <style>
+    body { font-family: sans-serif; max-width: 600px; margin: auto; padding: 2rem; line-height: 1.6; }
+    .hidden { display: none; }
+    .question-container { margin-top: 2rem; }
+    .option { display: block; margin: 0.5rem 0; }
+    #start-btn, #submit-btn, #next-btn { padding: 0.5rem 1rem; margin-top: 1rem; }
+    .result { font-weight: bold; margin-top: 1rem; color: green; }
+    .error { color: red; }
+  </style>
+</head>
+<body>
+  <h1>拒絕新型菸品，考出你的無菸力！</h1>
+  <div id="intro">
+    <p>📘 網路大會考正式開跑！挑戰 10 題，答對才能前進！</p>
+    <button id="start-btn">開始答題</button>
+  </div>
+
+  <div id="quiz" class="hidden">
+    <div id="progress"></div>
+    <div class="question-container">
+      <div id="question"></div>
+      <div id="options"></div>
+      <div id="feedback"></div>
+      <button id="next-btn" class="hidden">下一題</button>
+    </div>
+  </div>
+
+  <div id="end" class="hidden">
+    <h2>🎉 恭喜完成挑戰！</h2>
+    <p>你已成功完成 10 題測驗，獲得抽獎資格！</p>
+    <p><strong>請返回活動頁填寫資料完成報名。</strong></p>
+  </div>
+
+  <script>
+    const allQuestions = [
+      {
+        question: "關於電子煙，下列何者正確？",
+        options: ["電子煙內不含尼古丁，不會上癮", "電子煙主要是水蒸氣，對人體無害", "電子煙氣霧中可能含有重金屬與致癌物", "電子煙經常由醫師推薦使用"],
+        answer: 2
+      }, 
+      {
+        question: "加熱菸與傳統紙菸一樣，會產生對人體有害的化學物質。",
+        options: ["是", "否"],
+        answer: 0
+      },
+      {
+        question: "電子煙的霧化液常含有哪一項可能造成成癮的成分？",
+        options: ["維他命C", "尼古丁", "檸檬酸", "糖分"],
+        answer: 1
+      },
+      {
+        question: "依據現行《菸害防制法》，下列何者違法？",
+        options: ["超商販售香菸給成年消費者", "網路平台刊登電子煙廣告", "醫師在診間宣導戒菸", "家長於家中抽紙菸"],
+        answer: 1
+      },
+      {
+        question: "我可以在 Instagram 上看到KOL推薦電子煙並標註購買連結嗎？",
+        options: ["可以，這是他個人自由", "只要不販售就不違法", "不可以，這是違法促銷", "可以，但只能針對成年追蹤者"],
+        answer: 2
+      },
+      {
+        question: "依114年修法，電子煙屬於「指定菸品」，若未通過健康風險評估，應如何處置？",
+        options: ["可自由販售但需警語", "可於成人網站銷售", "一律禁止製造、輸入、販售", "只限實體商店販售"],
+        answer: 2
+      },
+      {
+        question: "「電子煙沒有煙味，所以比較健康」這句話正確嗎？",
+        options: ["正確，沒有煙味代表沒有害", "錯誤，電子煙仍可能含有有害物質", "正確，電子煙有水果味對身體比較好", "錯誤，但只對老人有害"],
+        answer: 1
+      },
+      {
+        question: "有些電子煙標榜「無尼古丁」，就不會讓人上癮，這是真的嗎？",
+        options: ["是，沒有尼古丁就不會成癮", "不一定，有些標示不實或有其他成癮成分", "是，因為成癮都是心理作用", "否，成癮與品牌有關"],
+        answer: 1
+      },
+      {
+        question: "下列哪一項是青少年接觸菸品的常見誘因？",
+        options: ["睡眠不足", "社交壓力與好奇", "吃太多甜食", "忘記運動"],
+        answer: 1
+      },
+      {
+        question: "你在YouTube看到一位實況主說「這款電子煙抽起來沒味道，超爽！」並提供購買連結，請問：這樣屬於違法嗎？",
+        options: ["否，沒有強迫人購買", "是，屬於違法廣告與促銷行為", "否，因為是國外實況主", "是，但只要他超過18歲就可以講"],
+        answer: 1
+      },
+      {
+        question: "下列哪一種情況屬於違法代言電子煙？",
+        options: ["醫師接受衛教採訪談論戒菸方法", "高中生在IG分享「朋友給我抽這款，真的很香」", "網紅拍影片呼籲青少年遠離新興菸品", "老師課堂中講述吸菸對身體的影響"],
+        answer: 1
+      },
+      {
+        question: "請問下列哪張圖片內容可能觸法？",
+        options: ["圖片顯示電子煙產品特寫，旁有標語：「最新水果口味，IG私訊下單」", "健康局宣導電子煙危害圖卡", "學生拒抽電子煙情境照片", "老師課堂板書菸害字詞圖"],
+        answer: 0
+      },
+      {
+        question: "如果你發現有同學在IG販售電子煙，你應該怎麼做？",
+        options: ["私訊問他哪裡買", "分享給朋友看", "向老師或學校輔導室反映，再通報主管機關", "不干我的事，不用理會"],
+        answer: 2
+      },
+      {
+        question: "青少年可透過下列何種方式通報違法販售電子煙的情事？",
+        options: ["電話向衛生局舉報", "使用「國民健康署」網站線上檢舉", "告知師長或輔導老師", "以上皆是"],
+        answer: 3
+      },
+      {
+        question: "「電子煙沒有燃燒，所以比較不會上癮」這句話正確嗎？",
+        options: ["正確", "錯誤，電子煙中仍可能含高濃度尼古丁", "正確，只是比紙菸好一點", "錯誤，但只能對女性有影響"],
+        answer: 1
+      },
+      {
+        question: "請選出一個你認為最適合用來提醒朋友不要抽電子煙的標語：",
+        options: ["「電子煙無害你敢試」", "「不讓菸霧偷走我的未來」", "「香香的，抽一口沒關係」", "「長大再說吧，現在先試」"],
+        answer: 1
+      },
+      {
+        question: "請將以下菸品分類為「合法/非法」或「應禁止青少年使用」",
+        options: ["傳統紙菸", "電子煙", "加熱菸（未通過審查）", " 香味電子霧化液"],
+        answer: 2
+      },
+      {
+        question: "下列哪一項是加熱菸的特色？",
+        options: ["完全不燃燒、不加熱", "外觀如糖果，無需煙彈", "使用加熱裝置加熱含菸草的膠囊或煙彈", "是電子煙的一種，使用液體"],
+        answer: 2
+      },
+      {
+        question: "下列哪一個不是正確的使用場域規定？",
+        options: ["加熱菸可在禁菸場所使用", "電子煙不得在校園內使用", "紙菸與電子煙皆不得在醫療院所內使用", "未成年人不得使用任何菸品"],
+        answer: 0
+      },
+      {
+        question: "哪一個說法是錯誤的？",
+        options: ["青少年使用電子煙有可能成為傳統菸品的入口", "目前台灣有通過健康風險評估的電子煙產品可自由販售", "吸食加熱菸也會產生尼古丁依賴", "台灣目前禁止任何人販售電子煙給未滿20歲者"],
+        answer: 1
+      },
+
+
+    ];
+
+    let quizQuestions = [], current = 0;
+    const startBtn = document.getElementById("start-btn");
+    const quizDiv = document.getElementById("quiz");
+    const introDiv = document.getElementById("intro");
+    const endDiv = document.getElementById("end");
+    const questionDiv = document.getElementById("question");
+    const optionsDiv = document.getElementById("options");
+    const feedbackDiv = document.getElementById("feedback");
+    const nextBtn = document.getElementById("next-btn");
+    const progress = document.getElementById("progress");
+
+    startBtn.onclick = () => {
+      quizQuestions = allQuestions.sort(() => 0.5 - Math.random()).slice(0, 3);
+      quizQuestions = allQuestions.sort(() => 0.5 - Math.random()).slice(0, 10);
+      introDiv.classList.add("hidden");
+      quizDiv.classList.remove("hidden");
+      showQuestion();
+    };
+
+    function showQuestion() {
+      const q = quizQuestions[current];
+      questionDiv.textContent = q.question;
+      progress.textContent = `第 ${current + 1} 題 / ${quizQuestions.length}`;
+      optionsDiv.innerHTML = "";
+      feedbackDiv.textContent = "";
+      nextBtn.classList.add("hidden");
+      q.options.forEach((opt, i) => {
+        const btn = document.createElement("button");
+        btn.className = "option";
+        btn.textContent = opt;
+        btn.onclick = () => checkAnswer(i);
+        optionsDiv.appendChild(btn);
+      });
+    }
+
+    function checkAnswer(selected) {
+      const q = quizQuestions[current];
+      if (selected === q.answer) {
+        feedbackDiv.innerHTML = '<span class="result">✅ 答對了！</span>';
+        nextBtn.classList.remove("hidden");
+      } else {
+        feedbackDiv.innerHTML = '<span class="error">❌ 答錯囉，再想想！</span>';
+      }
+    }
+
+    nextBtn.onclick = () => {
+      current++;
+      if (current >= quizQuestions.length) {
+        quizDiv.classList.add("hidden");
+        endDiv.classList.remove("hidden");
+      } else {
+        showQuestion();
+      }
+    };
+  </script>
+</body>
+</html>
