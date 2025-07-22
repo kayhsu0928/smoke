@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>拒絕新型菸品，大會考開始！</title>
+  <style>
+    body { font-family: sans-serif; max-width: 600px; margin: auto; padding: 2rem; line-height: 1.6; }
+    .hidden { display: none; }
+    .question-container { margin-top: 2rem; }
+    .option { display: block; margin: 0.5rem 0; }
+    #start-btn, #submit-btn, #next-btn { padding: 0.5rem 1rem; margin-top: 1rem; }
+    .result { font-weight: bold; margin-top: 1rem; color: green; }
+    .error { color: red; }
+  </style>
+</head>
+<body>
+  <h1>拒絕新型菸品，考出你的無菸力！</h1>
+  <div id="intro">
+    <p>📘 網路大會考正式開跑！挑戰 10 題，答對才能前進！</p>
+    <button id="start-btn">開始答題</button>
+  </div>
+
+  <div id="quiz" class="hidden">
+    <div id="progress"></div>
+    <div class="question-container">
+      <div id="question"></div>
+      <div id="options"></div>
+      <div id="feedback"></div>
+      <button id="next-btn" class="hidden">下一題</button>
+    </div>
+  </div>
+
+  <div id="end" class="hidden">
+    <h2>🎉 恭喜完成挑戰！</h2>
+    <p>你已成功完成 10 題測驗，獲得抽獎資格！</p>
+    <p><strong>請返回活動頁填寫資料完成報名。</strong></p>
+  </div>
+
+  <script>
+    const allQuestions = [
+      {
+        question: "電子煙對身體有什麼危害？",
+        options: ["完全無害", "含有尼古丁與致癌物質", "有助戒菸", "只是水蒸氣而已"],
+        answer: 1
+      },
+      {
+        question: "新版《菸害防制法》中，對電子煙的規範是？",
+        options: ["允許販售", "禁止製造、輸入、販售", "可以廣告但不能賣", "無特別規範"],
+        answer: 1
+      },
+      {
+        question: "以下哪一項屬於違法販售行為？",
+        options: ["KOL 在 IG 推薦電子煙", "私訊賣電子煙", "網路貼文推銷", "以上皆是"],
+        answer: 3
+      }
+    ];
+
+    let quizQuestions = [], current = 0;
+    const startBtn = document.getElementById("start-btn");
+    const quizDiv = document.getElementById("quiz");
+    const introDiv = document.getElementById("intro");
+    const endDiv = document.getElementById("end");
+    const questionDiv = document.getElementById("question");
+    const optionsDiv = document.getElementById("options");
+    const feedbackDiv = document.getElementById("feedback");
+    const nextBtn = document.getElementById("next-btn");
+    const progress = document.getElementById("progress");
+
+    startBtn.onclick = () => {
+      quizQuestions = allQuestions.sort(() => 0.5 - Math.random()).slice(0, 3);
+      introDiv.classList.add("hidden");
+      quizDiv.classList.remove("hidden");
+      showQuestion();
+    };
+
+    function showQuestion() {
+      const q = quizQuestions[current];
+      questionDiv.textContent = q.question;
+      progress.textContent = `第 ${current + 1} 題 / ${quizQuestions.length}`;
+      optionsDiv.innerHTML = "";
+      feedbackDiv.textContent = "";
+      nextBtn.classList.add("hidden");
+      q.options.forEach((opt, i) => {
+        const btn = document.createElement("button");
+        btn.className = "option";
+        btn.textContent = opt;
+        btn.onclick = () => checkAnswer(i);
+        optionsDiv.appendChild(btn);
+      });
+    }
+
+    function checkAnswer(selected) {
+      const q = quizQuestions[current];
+      if (selected === q.answer) {
+        feedbackDiv.innerHTML = '<span class="result">✅ 答對了！</span>';
+        nextBtn.classList.remove("hidden");
+      } else {
+        feedbackDiv.innerHTML = '<span class="error">❌ 答錯囉，再想想！</span>';
+      }
+    }
+
+    nextBtn.onclick = () => {
+      current++;
+      if (current >= quizQuestions.length) {
+        quizDiv.classList.add("hidden");
+        endDiv.classList.remove("hidden");
+      } else {
+        showQuestion();
+      }
+    };
+  </script>
+</body>
+</html>
